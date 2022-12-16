@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class BoardGenerator : MonoBehaviour
 {
-    [SerializeField] private GameObject whiteCell;
-    [SerializeField] private GameObject blackCell;
-    [SerializeField] private GameObject[] checkers;
-    private readonly GameObject[,] _boardGrid = new GameObject[11, 11];
+    [SerializeField] private Cell whiteCell;
+    [SerializeField] private Cell blackCell;
+    [SerializeField] private Checker[] checkers;
+    public static readonly Cell[,] BoardGrid = new Cell[11, 11];
     private int _rows;
     private int _columns;
     private bool _isBlack;
@@ -17,18 +17,20 @@ public class BoardGenerator : MonoBehaviour
 
     private void GenerateBoard()
     {
-        _rows = _boardGrid.GetUpperBound(0) + 1;
-        _columns = _boardGrid.Length / _rows;
+        _rows = BoardGrid.GetUpperBound(0) + 1;
+        _columns = BoardGrid.Length / _rows;
         for (int i = 0; i < _rows; i++)
         {
             for (int j = 0; j < _columns; j++)
             {
                 _isBlack = !_isBlack;
-                GameObject cell = _isBlack ? Instantiate(blackCell) : Instantiate(whiteCell);
+                var cell = _isBlack ? Instantiate(blackCell) : Instantiate(whiteCell);
                 cell.transform.SetParent(transform);
                 cell.transform.localPosition = new Vector3(j, 0, i);
                 cell.name = $"Cell ({i},{j})";
-                _boardGrid[i, j] = cell;
+                BoardGrid[i, j] = cell;
+                cell.i = i;
+                cell.j = j;
             }
         }
 
@@ -43,8 +45,10 @@ public class BoardGenerator : MonoBehaviour
         {
             for (int j = offset; j < a; j += 2)
             {
-                GameObject newChecker = Instantiate(checkers[0], _boardGrid[i, j].transform, true);
+                var newChecker = Instantiate(checkers[0], BoardGrid[i, j].transform, true);
+                BoardGrid[i, j].GetComponent<Cell>().isOccupied = true;
                 newChecker.transform.position = new Vector3(j, 0, i);
+                newChecker.currentCell = BoardGrid[i, j];
             }
 
             a--;
@@ -57,8 +61,10 @@ public class BoardGenerator : MonoBehaviour
         {
             for (int j = offset; j < a; j += 2)
             {
-                GameObject newChecker = Instantiate(checkers[1], _boardGrid[j, i].transform, true);
+                var newChecker = Instantiate(checkers[1], BoardGrid[j, i].transform, true);
+                BoardGrid[j, i].GetComponent<Cell>().isOccupied = true;
                 newChecker.transform.position = new Vector3(i, 0, j);
+                newChecker.currentCell = BoardGrid[j, i];
             }
 
             a--;
@@ -71,8 +77,10 @@ public class BoardGenerator : MonoBehaviour
         {
             for (int j = offset; j < a; j += 2)
             {
-                GameObject newChecker = Instantiate(checkers[2], _boardGrid[i, j].transform, true);
+                var newChecker = Instantiate(checkers[2], BoardGrid[i, j].transform, true);
+                BoardGrid[i, j].GetComponent<Cell>().isOccupied = true;
                 newChecker.transform.position = new Vector3(j, 0, i);
+                newChecker.currentCell = BoardGrid[i, j];
             }
 
             a--;
@@ -85,8 +93,10 @@ public class BoardGenerator : MonoBehaviour
         {
             for (int j = offset; j < a; j += 2)
             {
-                GameObject newChecker = Instantiate(checkers[3], _boardGrid[j, i].transform, true);
-                newChecker.transform.position = new Vector3(i,0, j);
+                var newChecker = Instantiate(checkers[3], BoardGrid[j, i].transform, true);
+                BoardGrid[j, i].GetComponent<Cell>().isOccupied = true;
+                newChecker.transform.position = new Vector3(i, 0, j);
+                newChecker.currentCell = BoardGrid[j, i];
             }
 
             a--;
